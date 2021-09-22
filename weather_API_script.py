@@ -1,4 +1,4 @@
-
+# 
 import requests
 #API documentation https://openweathermap.org/current
 import weather_class
@@ -31,7 +31,8 @@ def get_weather(API, city_id):
     response = requests.get(complete_url) #retuns the json code for the city
 
     updated_response = response.json()
-    translate_weather_data(updated_response)
+    # translate_weather_data(updated_response)
+    return updated_response
 
 
 

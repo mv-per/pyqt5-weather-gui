@@ -2,27 +2,32 @@ import os
 import ctypes
 from PyQt5.uic import loadUi
 
+# import threading
 import weather_API_script
 from operate_on_db import weatherGUI_database
 
+import mydata
+
 # Third part imports
-from PyQt5.QtGui import QStandardItemModel, QPixmap, QIcon, QFont
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import \
-    QDialog, QMessageBox, QMainWindow, QApplication, \
-    QTreeView, QTableWidget, QTableWidgetItem,\
-    QWidget, QPushButton, QInputDialog
+    QDialog, QMainWindow
 
 
 
+### 
 
 class WeatherGUI(QDialog):
-
+    # global mydata
     def __init__(self):
         QMainWindow.__init__(self)
         loadUi("WeatherGUI.ui", self)
 
-        self.API_KEY = None
+        try:
+            self.API_KEY = mydata.api
+        except:
+            self.API_KEY = None
+
         self.city_id = None
         self.country = None
         self.city = None
@@ -45,16 +50,51 @@ class WeatherGUI(QDialog):
         self.pushButton.clicked.connect(self.__load_weather)
 
 
-    def __update_interface(self):
-        self.label_11.setText(weather_API_script.weather.sky_description)
+    def __update_interface(self, data):
+
+
         # self.label_11.setText(weather_API_script.weather.sky_description)
+        # print(weather_API_script.weather.sky_description)
+        self.label_11.setText(data['weather'][0]['description'] + " with feeling temp of {} °C".format(round(data["main"]["feels_like"]-273.15,2)))
+        self.textEdit.setPlainText(str(round(data["main"]["temp"] - 273.15,2)))
+        self.textEdit_2.setPlainText(str(data["main"]["pressure"]))
+        self.textEdit_3.setPlainText(str(data["main"]["humidity"]))
+        self.textEdit_4.setPlainText(str(data["wind"]["speed"]))
+        # self.textEdit_5.setPlainText(str(data["main"]["humidity"]))
+
     
     def __load_weather(self):
-        self.API_KEY = self.textEdit_6.toPlainText()
+        if self.textEdit_6.toPlainText() == "":
+            print("API KEY NOT DEFINED, USING STORED API on mydata.py")
+        else:
+            self.API_KEY = self.textEdit_6.toPlainText()
         self.city_id = self.db.load_city_id(self.city, self.country)
+
+
+        data = weather_API_script.get_weather(self.API_KEY, int(float(self.city_id)))
+
+        cod = int(data['cod'])
+        if cod == 401 or cod == 429 or cod == 404:
+            print(f"ERROR: {data['cod']} - {data['message']}")
+        else:
+            # print(data)
+            self.__update_interface(data)
+
+
         # print(self.API_KEY, self.city_id)
-        weather_API_script.get_weather(self.API_KEY, int(float(self.city_id)))
-        self.__update_interface()
+        # data = threading.Thread(target=weather_API_script.get_weather(self.API_KEY, int(float(self.city_id))))
+        # data.start()
+        # while True:
+        #     if not data.is_alive():
+        #         print(data)
+        #         cod = int(data['cod'])
+        #         if cod == 401 or cod == 429 or cod == 404:
+        #             print(f"ERROR: {data['cod']} - {data['message']}")
+        #         else:
+        #             # print(data)
+        #             self.__update_interface(data)
+        #         break
+
 
     def __get_city(self, city):
 
