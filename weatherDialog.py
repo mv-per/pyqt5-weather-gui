@@ -1,12 +1,8 @@
-import os
-import ctypes
 from PyQt5.uic import loadUi
 
 # import threading
-import weather_API_script
+import weather_API_script, mydata
 from operate_on_db import weatherGUI_database
-
-import mydata
 
 # Third part imports
 from PyQt5.QtCore import Qt
