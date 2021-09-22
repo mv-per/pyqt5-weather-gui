@@ -1,8 +1,6 @@
-import requests, json
-
+import requests, json,sys
 import mydata
 import weatherDialog
-
 
 from PyQt5.QtWidgets import  QApplication
 

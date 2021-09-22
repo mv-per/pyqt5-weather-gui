@@ -28,8 +28,10 @@ class WeatherGUI(QDialog):
         self.country = None
         self.city = None
 
-        self.comboBox.clear()
-
+        #connects
+        self.comboBox.currentTextChanged.connect(self.__get_country)
+        self.comboBox_2.currentTextChanged.connect(self.__get_city)
+        
         #load database
         self.db = weatherGUI_database("dev\city_database\data.db", "city_list")
 
@@ -37,9 +39,7 @@ class WeatherGUI(QDialog):
         self.comboBox.clear()       # delete all items from comboBox
         self.comboBox.addItems(self.db.load_countries()) # add the actual content of self.comboData
         self.comboBox.setEnabled(True)
-        self.comboBox.currentTextChanged.connect(self.__get_country)
 
-        self.comboBox_2.currentTextChanged.connect(self.__get_city)
 
 
         self.pushButton.setEnabled(False)
