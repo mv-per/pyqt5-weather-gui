@@ -1,1 +1,3 @@
 mydata.py
+__pycache__
+*.pyc
